@@ -31,8 +31,9 @@
   --warn-bg: #ff6b35;
   --warn-text: #fff;
   --warn-close: #ffe0d3;
+  /* 图片占位背景 */
+  --img-placeholder: rgba(0,0,0,0.05);
 }
-
 /* 全局重置 */
 * {
   margin: 0;
@@ -44,11 +45,9 @@
   -webkit-touch-callout: none;
   touch-action: manipulation;
 }
-
 html {
   overflow-x: hidden;
 }
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   min-height: 100vh;
@@ -58,8 +57,8 @@ body {
   overflow-x: hidden;
   overscroll-behavior: none;
   -webkit-overscroll-behavior: none;
+  background-color: var(--img-placeholder);
 }
-
 /* 兼容模式提醒条样式 - 置顶最高层级 */
 .browser-warn {
   position: fixed;
@@ -93,9 +92,8 @@ body {
 .browser-warn-close:hover {
   background: rgba(255,255,255,0.3);
 }
-
-/* 背景平滑过渡伪元素 - 解决直接切换背景图闪屏 */
-body::before {
+/* 背景平滑过渡伪元素 - 对应1.png(深色)/2.jpg(浅色)，预加载后赋值 */
+body::before, body::after {
   content: "";
   position: fixed;
   inset: 0;
@@ -106,22 +104,17 @@ body::before {
   transition: opacity var(--animation-duration) var(--animation-easing);
   opacity: 1;
 }
+body::before {
+  background-image: url(2.jpg); /* 浅色背景：2.jpg */
+}
 body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+  background-image: url(1.png); /* 深色背景：1.png */
   z-index: -1;
-  transition: opacity var(--animation-duration) var(--animation-easing);
   opacity: 0;
 }
-
 a {
   text-decoration: none;
 }
-
 /* 减少动画偏好适配 - 尊重系统设置 */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -131,7 +124,6 @@ a {
     scroll-behavior: auto !important;
   }
 }
-
 /* 折叠展开动画 */
 .collapse-wrap {
   overflow: hidden;
@@ -156,8 +148,7 @@ a {
 .collapse-btn.active .arrow {
   transform: rotate(180deg);
 }
-
-/* 开屏动画 */
+/* 开屏动画 - Logo用3.png */
 #splash-screen {
   position: fixed;
   top: 0;
@@ -184,12 +175,12 @@ a {
   border-radius: var(--radius-4xl);
   object-fit: cover;
   animation: splash-pulse 1.2s ease-in-out infinite;
+  background: var(--img-placeholder);
 }
 @keyframes splash-pulse {
   0%,100% { transform: scale(1); }
   50% { transform: scale(1.08); }
 }
-
 /* 标签页切换动画 */
 .tab {
   opacity: 0;
@@ -205,7 +196,6 @@ a {
   transform: translateY(0);
   position: relative;
 }
-
 /* 深浅模式主题变量 */
 .theme-light {
   --text-primary: #111;
@@ -217,13 +207,6 @@ a {
   --blur-value: blur(12px);
   --splash-bg: rgba(255,255,255,0.96);
 }
-.theme-light::before {
-  background-image: url(2.jpg);
-}
-.theme-light::after {
-  background-image: url(1.png);
-}
-
 .theme-dark {
   --text-primary: #fff;
   --text-secondary: #e0e0e0;
@@ -234,19 +217,6 @@ a {
   --blur-value: blur(18px);
   --splash-bg: rgba(30,30,30,0.96);
 }
-.theme-dark::before {
-  background-image: url(2.jpg);
-}
-.theme-dark::after {
-  background-image: url(1.png);
-}
-.theme-dark::after {
-  opacity: 1;
-}
-.theme-dark::before {
-  opacity: 0;
-}
-
 /* 毛玻璃全浏览器兼容 */
 .sidebar,
 .top-banner,
@@ -258,8 +228,7 @@ a {
   border: 1px solid var(--border-color);
   transition: all var(--animation-duration) var(--animation-easing);
 }
-
-/* 侧边栏样式 */
+/* 侧边栏样式 - 头像用3.png */
 .sidebar {
   position: fixed;
   left: var(--spacing-xl);
@@ -282,7 +251,6 @@ a {
 .sidebar.hidden {
   left: calc(-20px - var(--sidebar-width));
 }
-
 .avatar {
   width: 50px;
   height: 50px;
@@ -299,7 +267,6 @@ a {
 .sidebar.expand .sidebar-name {
   display: block;
 }
-
 .nav-item {
   width: 50px;
   height: 50px;
@@ -327,7 +294,6 @@ a {
 .sidebar.expand .nav-text {
   display: inline;
 }
-
 .expand-btn {
   margin-top: auto;
   width: 50px;
@@ -348,7 +314,6 @@ a {
 .expand-btn:hover {
   background: var(--hover-bg);
 }
-
 /* 顶部活动栏 */
 .top-banner {
   position: fixed;
@@ -372,7 +337,6 @@ a {
 .sidebar.hidden ~ .top-banner {
   left: var(--spacing-xl);
 }
-
 /* 主内容区 */
 .main {
   margin-left: calc(var(--sidebar-width) + 40px);
@@ -387,7 +351,6 @@ a {
   margin-left: var(--spacing-xl);
   margin-right: var(--spacing-xl);
 }
-
 /* 卡片样式 */
 .card {
   border-radius: var(--radius-2xl);
@@ -406,7 +369,6 @@ a {
     cursor: grabbing;
   }
 }
-
 /* 按钮样式 */
 .item-btn {
   width: 100%;
@@ -428,7 +390,6 @@ a {
 .item-btn:active {
   transform: scale(0.98);
 }
-
 .back-btn {
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--radius-sm);
@@ -446,7 +407,6 @@ a {
 .back-btn:active {
   transform: scale(0.98);
 }
-
 /* 文字样式 */
 h2 {
   font-size: 18px;
@@ -466,7 +426,6 @@ p {
   line-height: 1.6;
   margin-bottom: var(--spacing-md);
 }
-
 .article-img {
   width: 100%;
   height: 160px;
@@ -481,7 +440,6 @@ p {
   overflow: hidden;
   object-fit: cover;
 }
-
 /* 底部导航栏 */
 .bottom-bar {
   position: fixed;
@@ -512,14 +470,12 @@ p {
 .bottom-item:active {
   transform: scale(0.95);
 }
-
 /* 响应式适配 - 移动端/桌面端区分 */
 @media (max-width: 768px) {
   .sidebar { display: none !important; }
   .top-banner { left: var(--spacing-xl) !important; right: var(--spacing-xl) !important; }
   .main { margin: 100px var(--spacing-xl) 0 !important; }
   .bottom-bar { display: flex !important; }
-  /* 移动端提醒条适配 */
   .browser-warn { font-size: 13px; padding: 8px var(--spacing-md); }
 }
 @media (min-width: 769px) {
@@ -528,14 +484,13 @@ p {
 </style>
 </head>
 <body class="theme-light">
-<!-- 开屏动画 -->
+<!-- 开屏动画 - Logo：3.png -->
 <div id="splash-screen" aria-hidden="true">
-  <img src="3.png" class="splash-logo" alt="Caelara_Lab Logo" onerror="this.style.background='var(--item-bg)'; this.src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='">
+  <img src="3.png" class="splash-logo" alt="Caelara_Lab Logo">
 </div>
-
-<!-- 侧边栏 -->
+<!-- 侧边栏 - 头像：3.png -->
 <div class="sidebar" id="sidebar" aria-label="主导航">
-  <img src="3.png" class="avatar" alt="用户头像" loading="lazy" onerror="this.style.background='var(--item-bg)'; this.src='data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='">
+  <img src="3.png" class="avatar" alt="用户头像">
   <div class="sidebar-name">Caelara_Lab 个人网站</div>
   
   <div class="nav-item active" data-tab="home" aria-label="首页" aria-current="page">
@@ -557,10 +512,8 @@ p {
   
   <button class="expand-btn" id="toggleBtn" aria-label="展开/收起侧边栏" aria-expanded="false">▶</button>
 </div>
-
 <!-- 顶部活动栏 -->
 <div class="top-banner" id="topBanner" role="banner" aria-live="polite">🎉 欢迎来到 Caelara_Lab 个人网站<br>Ver 1.0已上线</div>
-
 <!-- 主内容区 -->
 <div class="main">
   <div class="card" id="cardElement">
@@ -569,7 +522,6 @@ p {
       <h2>欢迎来到 Caelara_Lab 个人网站</h2>
       <p>Caelara_Lab的个人网站，1.0版本</p>
     </div>
-
     <!-- 内容合集 -->
     <div id="content" class="tab" role="tabpanel" aria-labelledby="content-tab">
       <h2>📂 内容合集</h2>
@@ -581,7 +533,6 @@ p {
       <button class="item-btn" type="button" data-tab="pov">🎬 POV</button>
       <button class="item-btn" type="button" data-tab="download">📥 下载专区</button>
     </div>
-
     <!-- 下载专区 -->
     <div id="download" class="tab" role="tabpanel" aria-labelledby="download-tab">
       <button class="back-btn" type="button" data-tab="content">← 返回</button>
@@ -595,11 +546,11 @@ p {
       </a>
       <a href="https://www.123865.com/s/fPoUVv-Va8Ah" target="_blank" rel="noopener noreferrer">
         <button class="item-btn" type="button">🔗 UP的所有Windows美化包</button>
+      </a>
       <a href="https://www.123865.com/s/fPoUVv-ja8Ah" target="_blank" rel="noopener noreferrer">
         <button class="item-btn" type="button">🔗 Cze&Pov素材</button>
       </a>
     </div>
-
     <!-- 美化包 -->
     <div id="theme" class="tab" role="tabpanel" aria-labelledby="theme-tab">
       <button class="back-btn" type="button" data-tab="content">← 返回</button>
@@ -607,67 +558,50 @@ p {
       <h3>流萤美化包 For win8，10，11</h3>
       <p>开发中。。。</p>
       <div class="article-img"></div>
-      <p></p>
     </div>
-
     <!-- 假期节 -->
     <div id="holiday" class="tab" role="tabpanel" aria-labelledby="holiday-tab">
       <button class="back-btn" type="button" data-tab="content">← 返回</button>
       <h2>🎉 假期节</h2>
       <h3>QQ群：623052855</h3>
       <p>寒假场的活动时间是1月30日到3月7日（3月5日以后不可以加群）</p>
-      <p>1.为了保障群安全，加入本群需要输入你的哔哩哔哩UID，用于记录，会进行保密措施，若无B站号可以加我QQ3903164260
-      <p>2.如果因为违规违纪踢出群聊的，本场活动不能二次加入此群<p>
+      <p>1.为了保障群安全，加入本群需要输入你的哔哩哔哩UID，用于记录，会进行保密措施，若无B站号可以加我QQ3903164260</p>
+      <p>2.如果因为违规违纪踢出群聊的，本场活动不能二次加入此群</p>
       <p>3.加入后请自觉遵守群规</p>
       <div class="article-img"></div>
-      <p></p>
     </div>
-
     <!-- 文章 -->
     <div id="article" class="tab" role="tabpanel" aria-labelledby="article-tab">
       <button class="back-btn" type="button" data-tab="content">← 返回</button>
       <h2>📄 文章</h2>
       <h3>没写完</h3>
-      <p></p>
       <div class="article-img"></div>
-      <p></p>
     </div>
-
     <!-- 历史 -->
     <div id="history" class="tab" role="tabpanel" aria-labelledby="history-tab">
       <button class="back-btn" type="button" data-tab="content">← 返回</button>
       <h2>📜 历史</h2>
       <h3>没写好</h3>
-      <p></p>
       <div class="article-img"></div>
-      <p></p>
     </div>
-
     <!-- 软件 -->
     <div id="soft" class="tab" role="tabpanel" aria-labelledby="soft-tab">
       <button class="back-btn" type="button" data-tab="content">← 返回</button>
       <h2>🧩 软件</h2>
       <h3>没写好</h3>
-      <p></p>
       <div class="article-img"></div>
-      <p></p>
     </div>
-
     <!-- POV -->
     <div id="pov" class="tab" role="tabpanel" aria-labelledby="pov-tab">
       <button class="back-btn" type="button" data-tab="content">← 返回</button>
       <h2>🎬 POV</h2>
       <h3>没写好</h3>
-      <p></p>
       <div class="article-img"></div>
-      <p></p>
     </div>
-
     <!-- 关于页面 -->
     <div id="about" class="tab" role="tabpanel" aria-labelledby="about-tab">
       <h2>ℹ️ 关于本站</h2>
       <p>Caelara_Lab 个人网站，由豆包AI生成代码，Github托管</p>
-
       <!-- 友链折叠区 -->
       <button class="item-btn collapse-btn" type="button" data-collapse="friend" aria-expanded="false">
         <span>🔗 友链</span>
@@ -687,7 +621,6 @@ p {
           <button class="item-btn" type="button">胡桃玩VM的网站</button>
         </a>
       </div>
-
       <!-- 快速入口折叠区 -->
       <button class="item-btn collapse-btn" type="button" data-collapse="quick" aria-expanded="false" style="margin-top:8px">
         <span>📌 个人账号</span>
@@ -703,14 +636,13 @@ p {
         <a href="https://www.xiaohongshu.com/user/profile/66b88a58000000000d02622a" target="_blank" rel="noopener noreferrer">
           <button class="item-btn" type="button">小红书号</button>
         </a>
-        <a href="https://www.acfun.cn/u/57010386"_blank" rel="noopener noreferrer">
+        <a href="https://www.acfun.cn/u/57010386" target="_blank" rel="noopener noreferrer">
           <button class="item-btn" type="button">Acfun号</button>
         </a>
         <a href="" target="_blank" rel="noopener noreferrer">
           <button class="item-btn" type="button">预留</button>
         </a>
       </div>
-
       <!-- 意见反馈板块 -->
       <h3 style="margin-top:20px">📮 意见反馈</h3>
       <p>如果你有任何建议或问题，欢迎通过邮箱联系我</p>
@@ -718,7 +650,6 @@ p {
     </div>
   </div>
 </div>
-
 <!-- 底部移动端导航栏 -->
 <div class="bottom-bar" id="bottomBar" aria-label="移动端底部导航">
   <div class="bottom-item active" data-tab="home" aria-label="首页" aria-current="page">🏠</div>
@@ -730,47 +661,59 @@ p {
 <script>
 // 全局作用域隔离 - 避免变量污染
 (function() {
-  // 全局配置项 - 统一管理可配置参数
+  // 全局配置项
   const CONFIG = {
-    scrollThrottleDelay: 100,    // 滚动事件节流延迟(ms)
-    splashDuration: 1200,        // 开屏动画时长(ms)
-    scrollThreshold: 10,         // 滚动检测阈值(px)
-    storageKey: 'caelara_lab_theme', // 主题存储键
-    warnStorageKey: 'caelara_lab_hide_warn' // 兼容提醒关闭记忆键
+    scrollThrottleDelay: 100,
+    splashDuration: 1200,
+    scrollThreshold: 10,
+    storageKey: 'caelara_lab_theme',
+    warnStorageKey: 'caelara_lab_hide_warn'
   };
 
-  // ===== 核心：浏览器兼容模式/IE内核检测 + 提醒条 =====
+  // ===== 核心：3张高分辨率图片预加载（1.png/2.jpg/3.png）=====
+  function preloadImages(callback) {
+    // 预加载根目录3张图，按你的要求顺序：1.png、2.jpg、3.png
+    const imageUrls = ['1.png', '2.jpg', '3.png'];
+    let loadedCount = 0;
+    const totalCount = imageUrls.length;
+    // 遍历创建图片对象，后台悄悄加载，不阻塞页面
+    imageUrls.forEach(url => {
+      const img = new Image();
+      img.src = url;
+      // 单张加载完成
+      img.onload = () => {
+        loadedCount++;
+        if (loadedCount === totalCount) callback && callback();
+      };
+      // 加载失败兼容（不影响页面）
+      img.onerror = () => {
+        loadedCount++;
+        if (loadedCount === totalCount) callback && callback();
+      };
+    });
+  }
+
+  // 兼容模式检测
   function checkBrowserCompat() {
-    // 若用户手动关闭过提醒，不再显示
     if (localStorage.getItem(CONFIG.warnStorageKey) === 'true') return;
-
-    // 精准检测：IE浏览器、Edge/Chrome开启IE兼容模式、Trident内核
     const isIE = !!window.ActiveXObject || 'ActiveXObject' in window;
-    const isIECompat = navigator.userAgent.indexOf('Trident') > -1 
-                      || navigator.userAgent.indexOf('MSIE') > -1
-                      || !!document.documentMode; // IE兼容模式核心标识
-
-    // 检测到兼容模式，创建并插入提醒条
+    const isIECompat = navigator.userAgent.indexOf('Trident') > -1 || navigator.userAgent.indexOf('MSIE') > -1 || !!document.documentMode;
     if (isIE || isIECompat) {
       const warnBar = document.createElement('div');
       warnBar.className = 'browser-warn';
       warnBar.innerHTML = `
-        ⚠️ 检测到浏览器开启兼容模式，将导致页面样式/功能异常，请关闭兼容模式或使用现代浏览器！
-        <button class="browser-warn-close" title="关闭提醒，不再显示">×</button>
+        ⚠️ 检测到浏览器兼容模式，样式/功能会异常，请关闭或用现代浏览器！
+        <button class="browser-warn-close" title="关闭提醒">×</button>
       `;
       document.body.appendChild(warnBar);
-
-      // 关闭提醒条逻辑 - 点击后记忆状态
       warnBar.querySelector('.browser-warn-close').addEventListener('click', () => {
         warnBar.remove();
         localStorage.setItem(CONFIG.warnStorageKey, 'true');
       });
     }
   }
-  // 页面加载立即检测兼容模式
-  checkBrowserCompat();
 
-  // DOM元素缓存 - 仅查询一次，提升性能
+  // DOM元素缓存
   const elements = {
     body: document.body,
     splashScreen: document.getElementById('splash-screen'),
@@ -787,14 +730,14 @@ p {
     allCollapseTriggers: document.querySelectorAll('[data-collapse]'),
   };
 
-  // 页面状态管理 - 统一维护状态
+  // 页面状态管理
   let state = {
     isDark: false,
     lastScrollTop: window.pageYOffset || document.documentElement.scrollTop,
     isScrolling: false
   };
 
-  // 工具函数：节流 - 减少高频事件触发
+  // 工具函数：节流 - 减少滚动事件触发，提升性能
   function throttle(fn, delay) {
     let timer = null;
     return function(...args) {
@@ -807,7 +750,7 @@ p {
     };
   }
 
-  // 工具函数：平滑滚动到顶部 - 尊重系统减少动画设置
+  // 平滑滚动到顶部
   function scrollToTop() {
     const shouldSmooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({
@@ -816,15 +759,13 @@ p {
     });
   }
 
-  // 初始化折叠面板功能
+  // 初始化折叠面板
   function initCollapse() {
     elements.allCollapseTriggers.forEach(trigger => {
       trigger.addEventListener('click', () => {
         const collapseId = trigger.dataset.collapse;
         const wrap = document.getElementById(`${collapseId}-wrap`);
         const isActive = wrap.classList.contains('active');
-        
-        // 更新样式和无障碍属性
         wrap.classList.toggle('active');
         trigger.classList.toggle('active');
         trigger.setAttribute('aria-expanded', !isActive);
@@ -833,7 +774,7 @@ p {
     });
   }
 
-  // 初始化侧边栏展开/收起功能
+  // 初始化侧边栏展开/收起
   function initSidebar() {
     elements.toggleBtn.addEventListener('click', () => {
       const isExpanded = elements.sidebar.classList.contains('expand');
@@ -843,44 +784,42 @@ p {
     });
   }
 
-  // 初始化标签页切换 - 合并原show/showDetail，统一逻辑
+  // 初始化标签页切换
   function initTabSwitch() {
     elements.allTabTriggers.forEach(trigger => {
       trigger.addEventListener('click', () => {
         const targetTabId = trigger.dataset.tab;
         const targetTab = document.getElementById(targetTabId);
-        if (!targetTab) return; // 目标不存在则终止
-
-        // 1. 隐藏所有标签页
+        if (!targetTab) return;
+        // 隐藏所有标签
         elements.allTabs.forEach(tab => tab.classList.remove('active'));
-        // 2. 激活目标标签页
+        // 激活目标标签
         targetTab.classList.add('active');
-        // 3. 清除所有导航高亮
+        // 清除所有导航高亮
         elements.allNavItems.forEach(item => {
           item.classList.remove('active');
           item.removeAttribute('aria-current');
         });
-        // 4. 同步侧边栏/底部导航高亮
+        // 同步侧边栏/底部导航高亮
         document.querySelectorAll(`[data-tab="${targetTabId}"]`).forEach(item => {
           item.classList.add('active');
           item.setAttribute('aria-current', 'page');
         });
-        // 5. 显示顶部banner
+        // 显示顶部banner
         elements.topBanner.classList.remove('hidden');
-        // 6. 滚动到页面顶部
+        // 滚动到顶部
         scrollToTop();
       });
     });
   }
 
-  // 初始化深浅模式切换 - 本地存储记忆
+  // 初始化深浅模式（切换1.png/2.jpg背景）
   function initThemeToggle() {
-    // 从本地存储读取主题，初始化状态
+    // 从本地存储读取记忆的主题
     const savedTheme = localStorage.getItem(CONFIG.storageKey);
     if (savedTheme === 'dark') {
       toggleDarkMode(true);
     }
-
     // 绑定切换事件
     const toggleHandler = () => toggleDarkMode(!state.isDark);
     elements.themeToggleSidebar.addEventListener('click', toggleHandler);
@@ -889,28 +828,30 @@ p {
     // 深浅模式切换核心逻辑
     function toggleDarkMode(isDark) {
       state.isDark = isDark;
-      // 更新body类名
+      // 切换主题类名
       elements.body.classList.toggle('theme-dark', isDark);
       elements.body.classList.toggle('theme-light', !isDark);
-      // 更新切换图标
+      // 切换图标
       const icon = isDark ? '🌙' : '☀️';
       elements.themeIcon.textContent = icon;
       elements.themeToggleBottom.textContent = icon;
-      // 保存到本地存储
+      // 切换背景图：深色=1.png（显示），浅色=2.jpg（显示）
+      elements.body.querySelector('::after').style.opacity = isDark ? 1 : 0;
+      // 保存主题到本地存储
       localStorage.setItem(CONFIG.storageKey, isDark ? 'dark' : 'light');
     }
   }
 
-  // 初始化智能滚动 - 节流优化，隐藏/显示顶部栏
+  // 初始化滚动处理（隐藏/显示顶部栏）
   function initScrollHandler() {
     const handleScroll = throttle(() => {
       const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      // 滚动幅度小于阈值，不处理
+      // 滚动幅度太小，不处理
       if (Math.abs(currentScrollTop - state.lastScrollTop) <= CONFIG.scrollThreshold) {
         state.lastScrollTop = currentScrollTop;
         return;
       }
-      // 向下滚动且超过30px，隐藏顶部栏；否则显示
+      // 向下滚动超过30px，隐藏顶部栏；否则显示
       if (currentScrollTop > state.lastScrollTop && currentScrollTop > 30) {
         elements.topBanner.classList.add('hidden');
       } else {
@@ -919,11 +860,10 @@ p {
       // 更新上次滚动位置，避免负值
       state.lastScrollTop = currentScrollTop <= 0 ? 0 : currentScrollTop;
     }, CONFIG.scrollThrottleDelay);
-
     window.addEventListener('scroll', handleScroll);
   }
 
-  // 初始化电脑端拖拽光标状态
+  // 初始化电脑端拖拽光标
   function initDragCursor() {
     elements.card.addEventListener('mousedown', () => {
       elements.card.classList.add('dragging');
@@ -933,31 +873,31 @@ p {
     });
   }
 
-  // 初始化禁止页面缩放 - 兼容移动端/桌面端
+  // 禁止页面缩放（移动端/桌面端）
   function initScalePrevention() {
-    // 禁止双指缩放
     document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
-    // 禁止双击缩放
     let lastTouchTime = 0;
     document.addEventListener('touchend', (e) => {
       const currentTime = new Date().getTime();
+      // 禁止双击缩放
       if (currentTime - lastTouchTime < 300) e.preventDefault();
       lastTouchTime = currentTime;
     }, { passive: false });
   }
 
-  // 初始化开屏动画
+  // 初始化开屏动画（预加载完成后再隐藏，避免图片卡顿）
   function initSplashScreen() {
-    window.addEventListener('load', () => {
+    preloadImages(() => {
+      // 3张图全部预加载完成后，再执行开屏动画隐藏
       setTimeout(() => {
         elements.splashScreen.classList.add('hidden');
       }, CONFIG.splashDuration);
     });
   }
 
-  // 页面总初始化 - 按顺序执行所有初始化函数
+  // 页面总初始化 - 按顺序执行
   function init() {
-    initSplashScreen();
+    checkBrowserCompat();
     initCollapse();
     initSidebar();
     initTabSwitch();
@@ -965,9 +905,10 @@ p {
     initScrollHandler();
     initDragCursor();
     initScalePrevention();
+    initSplashScreen(); // 最后执行预加载+开屏动画
   }
 
-  // DOM加载完成后启动页面
+  // DOM加载完成后，启动整个页面
   document.addEventListener('DOMContentLoaded', init);
 })();
 </script>
